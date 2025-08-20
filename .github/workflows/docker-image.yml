@@ -10,20 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -
-        name: Docker meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          tags: |
-            # minimal (short sha)
-            type=sha,prefix=acyr/samba-
-      -
         name: Login to GitHub Container Registry
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      -
+        name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/acyr/samba
+          tags: |
+            # minimal (short sha)
+            type=sha,prefix=
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
