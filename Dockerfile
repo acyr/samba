@@ -1,8 +1,15 @@
-FROM alpine
-MAINTAINER David Personette <dperson@gmail.com>
+FROM ghcr.io/linuxserver/baseimage-alpine:3.22
+
+# set version label
+LABEL maintainer="acyr"
 
 # Install samba
-RUN apk --no-cache --no-progress upgrade && \
+RUN \
+    if [ -z ${SAMBA_RELEASE+x} ]; then \
+      SAMBA_RELEASE=$(curl -sL "http://dl-cdn.alpinelinux.org/alpine/v3.22/main/x86_64/APKINDEX.tar.gz" | tar -xz -C /tmp \
+      && awk '/^P:samba$/,/V:/' /tmp/APKINDEX | sed -n 2p | sed 's/^V://'); \
+    fi && \
+    apk --no-cache --no-progress upgrade && \
     apk --no-cache --no-progress add bash samba shadow tini tzdata && \
     addgroup -S smb && \
     adduser -S -D -H -h /tmp -s /sbin/nologin -G smb -g 'Samba User' smbuser &&\
@@ -53,6 +60,8 @@ RUN apk --no-cache --no-progress upgrade && \
     echo '   fruit:veto_appledouble = no' >>$file && \
     echo '   fruit:wipe_intentionally_left_blank_rfork = yes' >>$file && \
     echo '' >>$file && \
+    printf "Samba version: ${SAMBA_RELEASE}" > /build_version && \
+    echo "**** clean up ****" && \
     rm -rf /tmp/*
 
 COPY samba.sh /usr/bin/
