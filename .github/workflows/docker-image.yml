@@ -7,11 +7,8 @@ on:
     branches: [ "master" ]
 
 jobs:
-
-  buildx:
-
+  docker:
     runs-on: ubuntu-latest
-
     steps:
       -
         name: Login to GitHub Container Registry
@@ -27,6 +24,5 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
           push: true
-          tags: acyr/samba:latest
+          tags: acyr/samba:$(git rev-parse --short HEAD)
